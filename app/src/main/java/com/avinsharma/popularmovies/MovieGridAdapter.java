@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -15,20 +14,18 @@ import java.util.ArrayList;
 /**
  * Created by Avin on 11-12-2016.
  */
-public class MovieAdapter extends ArrayAdapter<Movie>{
+public class MovieGridAdapter extends ArrayAdapter<Movie>{
 
 
-    public MovieAdapter(Context context, ArrayList<Movie> objects) {
+    public MovieGridAdapter(Context context, ArrayList<Movie> objects) {
         super(context,0, objects);
     }
 
     static class ViewHolder{
         ImageView imageView;
-        TextView textView;
 
         public ViewHolder(View view){
             imageView = (ImageView) view.findViewById(R.id.movie_thumbnail_imageview);
-            textView = (TextView) view.findViewById(R.id.movie_title_textview);
         }
     }
 
@@ -48,7 +45,6 @@ public class MovieAdapter extends ArrayAdapter<Movie>{
         Movie currentMovie = getItem(position);
 
         Picasso.with(convertView.getContext()).load(currentMovie.getmImageUrl()).into(holder.imageView);
-        holder.textView.setText(currentMovie.getmTitle());
 
         return convertView;
     }

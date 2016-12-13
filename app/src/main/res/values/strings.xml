@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">PopularMovies</string>
+    <string name="empty_text_view_no_data">No data</string>
+    <string name="empty_text_view_no_internet_connection">No internet connection</string>
+    <string name="label_release_date">Release Date:</string>
+    <string name="label_synopsis">Synopsis</string>
+
+    <!--Strings for Sort order preference-->
+    <string name="settings_sort_order_label">Sort Order</string>
+    <string name="settings_sort_order_key">sort_order</string>
+    <string name="settings_sort_order_default_value">@string/settings_sort_order_top_rated_value</string>
+
+    <!--Strings for Sort order popular option-->
+    <string name="settings_sort_order_popular_label">Popular</string>
+    <string name="settings_sort_order_popular_value">popular</string>
+
+    <!--String for sort order top-rated option-->
+    <string name="settings_sort_order_top_rated_label">Top Rated</string>
+    <string name="settings_sort_order_top_rated_value">top_rated</string>
+    <string name="settings_activity_label">Settings</string>
+
 </resources>
