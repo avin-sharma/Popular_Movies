@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     TextView empty;
     ProgressBar progressBar;
     boolean hasDataSaved = false;
+    static boolean hasPreferenceChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,17 +67,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 
     @Override
     protected void onStart() {
-        if (!hasDataSaved){
+        if (!hasDataSaved || hasPreferenceChanged){
             movies = new ArrayList();
             adapter = new MovieGridAdapter(this, movies);
+            Log.v(LOG_TAG, "Making a new network call!!, hasDataChanged: " + hasPreferenceChanged);
             updateUi();
         }else {
             progressBar.setVisibility(View.GONE);
             adapter = new MovieGridAdapter(this, movies);
+            Log.v(LOG_TAG, "Using saved data!!, hasDataChanged: " + hasPreferenceChanged);
         }
         gridView.setAdapter(adapter);
 
@@ -85,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        hasDataSaved = false;
         empty.setText("");
         progressBar.setVisibility(View.VISIBLE);
         super.onStop();
@@ -122,8 +125,9 @@ public class MainActivity extends AppCompatActivity {
             task.execute();
         } else {
             empty.setText(R.string.empty_text_view_no_internet_connection);
-            Toast.makeText(MainActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
         }
+        hasPreferenceChanged = false;
     }
 
     private String fetchMovieJsonString() {
