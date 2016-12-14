@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             task.execute();
         } else {
             empty.setText(R.string.empty_text_view_no_internet_connection);
-            Toast.makeText(MainActivity.this, "", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, R.string.empty_text_view_no_internet_connection, Toast.LENGTH_SHORT).show();
         }
         hasPreferenceChanged = false;
     }
