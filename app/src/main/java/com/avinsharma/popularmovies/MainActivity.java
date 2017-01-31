@@ -1,38 +1,23 @@
 package com.avinsharma.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.avinsharma.popularmovies.adapter.MovieCursorAdapter;
+import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.sync.SyncAdapter;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieCursorAdapter.Callback{
 
     static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -41,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     MovieGridAdapter adapter;
     TextView empty;
     ProgressBar progressBar;
+
     boolean hasDataSaved = false;
     static boolean hasPreferenceChanged = false;
 
@@ -49,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (!(savedInstanceState == null || !savedInstanceState.containsKey("movies"))){
+        /*if (!(savedInstanceState == null || !savedInstanceState.containsKey("movies"))){
             movies = savedInstanceState.getParcelableArrayList("movies");
             hasDataSaved = true;
         }
@@ -66,31 +52,41 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("movie", adapter.getItem(i));
                 startActivity(intent);
             }
-        });
+        });*/
 
+        getContentResolver().delete(MovieProvider.Movies.CONTENT_URI, null, null);
+        // Initialize sync adapter
+        SyncAdapter.initializeSyncAdapter(this);
+        SyncAdapter.syncImmediately(this);
     }
 
     @Override
     protected void onStart() {
-        if (!hasDataSaved || hasPreferenceChanged){
+        if (hasPreferenceChanged){
+            GridFragment gridFragment = (GridFragment) getSupportFragmentManager().findFragmentById(R.id.grid_fragment);
+            gridFragment.onPreferenceChanged();
+            hasPreferenceChanged = false;
+        }
+        /*if (!hasDataSaved || hasPreferenceChanged){
             movies = new ArrayList();
             adapter = new MovieGridAdapter(this, movies);
-            Log.v(LOG_TAG, "Making a new network call!!, hasDataChanged: " + hasPreferenceChanged);
+            Log.v(LOG_TAG, "Making a new network call!!, hasDataChanged: " + hasPreferenceChanged
+            + " ,has saved data :" + hasDataSaved);
             updateUi();
         }else {
             progressBar.setVisibility(View.GONE);
             adapter = new MovieGridAdapter(this, movies);
             Log.v(LOG_TAG, "Using saved data!!, hasDataChanged: " + hasPreferenceChanged);
         }
-        gridView.setAdapter(adapter);
+        gridView.setAdapter(adapter);*/
 
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        empty.setText("");
-        progressBar.setVisibility(View.VISIBLE);
+        /*empty.setText("");
+        progressBar.setVisibility(View.VISIBLE);*/
         super.onStop();
     }
 
@@ -112,144 +108,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movies", movies);
+        /*hasDataSaved = true;
+        outState.putParcelableArrayList("movies", movies);*/
         super.onSaveInstanceState(outState);
     }
 
-    private void updateUi (){
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            FetchMoviesTask task = new FetchMoviesTask();
-            task.execute();
-        } else {
-            empty.setText(R.string.empty_text_view_no_internet_connection);
-            Toast.makeText(MainActivity.this, R.string.empty_text_view_no_internet_connection, Toast.LENGTH_SHORT).show();
-        }
-        hasPreferenceChanged = false;
-    }
-
-    private String fetchMovieJsonString() {
-
-        final String MOVIES_BASE_URL = "https://api.themoviedb.org/3/movie";
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String sortOrder = sharedPreferences.getString(getString(R.string.settings_sort_order_key),getString(R.string.settings_sort_order_default_value));
-        String jsonString;
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        try {
-
-            Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                    .appendPath(sortOrder)
-                    .appendQueryParameter("api_key", BuildConfig.THE_MOVIE_DB_API_KEY)
-                    .build();
-
-            URL url = new URL(builtUri.toString());
-
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            InputStream inputStream = urlConnection.getInputStream();
-            if (inputStream == null) {
-                return null;
-            }
-
-            StringBuilder buffer = new StringBuilder();
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line + "\n");
-            }
-            if (buffer.length() == 0) {
-                return null;
-            }
-            jsonString = buffer.toString();
-            return jsonString;
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error fetching JSON from api ", e);
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e(LOG_TAG, "Error closing Buffered reader ", e);
-                }
-            }
-        }
-        return null;
-    }
-
-    private ArrayList<Movie> getMoviesDataFromJson(String jsonString)
-            throws JSONException {
-
-        ArrayList<Movie> movies = new ArrayList<>();
-
-        final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w342";
-        final String BASE_BACKDROP_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
-        final String TMDB_RESULTS = "results";
-        final String TMDB_POSTER_PATH = "poster_path";
-        final String TMDB_BACKDROP_PATH = "backdrop_path";
-        final String TMDB_SYNOPSIS = "overview";
-        final String TMDB_RELEASE_DATE = "release_date";
-        final String TMDB_TITLE = "original_title";
-        final String TMDB_RATING = "vote_average";
-
-        JSONObject root = new JSONObject(jsonString);
-        JSONArray results = root.getJSONArray(TMDB_RESULTS);
-        JSONObject currentObject;
-        String title;
-        String synopsis;
-        String releaseDate;
-        String posterUrl;
-        String backdropUrl;
-        String rating;
-        Movie currentMovie;
-
-        if (results != null)
-            for (int i = 0; i < results.length(); i++) {
-                currentObject = results.getJSONObject(i);
-                title = currentObject.getString(TMDB_TITLE);
-                synopsis = currentObject.getString(TMDB_SYNOPSIS);
-                releaseDate = currentObject.getString(TMDB_RELEASE_DATE);
-                posterUrl = BASE_IMAGE_URL + currentObject.getString(TMDB_POSTER_PATH);
-                backdropUrl = BASE_BACKDROP_IMAGE_URL + currentObject.getString(TMDB_BACKDROP_PATH);
-                rating = currentObject.getString(TMDB_RATING);
-                currentMovie = new Movie(title, synopsis, rating, releaseDate, posterUrl, backdropUrl);
-                movies.add(currentMovie);
-            }
-
-        return movies;
-    }
-
-    public class FetchMoviesTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
-
-        @Override
-        protected ArrayList<Movie> doInBackground(Void... voids) {
-            try {
-                return getMoviesDataFromJson(fetchMovieJsonString());
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "Error parsing JSON ", e);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> m) {
-            if (m != null) {
-                movies = m;
-                adapter.clear();
-                adapter.addAll(m);
-            }
-            progressBar.setVisibility(View.GONE);
-            empty.setText(R.string.empty_text_view_no_data);
-        }
+    @Override
+    public void onItemSelected(Uri targetUri) {
+        //TODO: start detail fragment by passing uri in bundle or data in fragment or intent respectively
+        Intent intent = new Intent(this, DetailsActivity.class);
+        intent.setData(targetUri);
+        startActivity(intent);
+        Toast.makeText(this, "Callback called: onItemSelected, URI: " + targetUri.toString(), Toast.LENGTH_SHORT).show();
     }
 }

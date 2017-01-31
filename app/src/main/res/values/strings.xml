@@ -18,5 +18,10 @@
     <string name="settings_sort_order_top_rated_label">Top Rated</string>
     <string name="settings_sort_order_top_rated_value">top_rated</string>
     <string name="settings_activity_label">Settings</string>
+    <string name="content_authority">com.avinsharma.popularmovies</string>
+    <string name="sync_account_type">avinsharma.com</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
