@@ -2,8 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_settings"
-        android:title="@string/settings_activity_label"
-        app:showAsAction="never"/>
+    <item android:id="@+id/sort_order"
+        android:title="@string/settings_sort_order_label"
+        android:icon="@drawable/ic_sort_white_36dp"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item android:id="@+id/popular_movies_menu"
+                android:title="@string/settings_sort_order_popular_label"/>
+            <item android:id="@+id/top_rated_movies_menu"
+                android:title="@string/settings_sort_order_top_rated_label"/>
+            <item android:id="@+id/favourite_movies_menu"
+                android:title="@string/settings_sort_order_favourite_label"/>
+        </menu>
+    </item>
 
 </menu>

@@ -11,14 +11,17 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.avinsharma.popularmovies.BuildConfig;
 import com.avinsharma.popularmovies.R;
+import com.avinsharma.popularmovies.Utility;
 import com.avinsharma.popularmovies.data.MovieColumns;
 import com.avinsharma.popularmovies.data.MovieProvider;
 
@@ -80,6 +83,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             getMoviesDataFromJson(fetchNewMoviesJsonString(getContext().getString(R.string.settings_sort_order_popular_value)), (getContext().getString(R.string.settings_sort_order_popular_value)));
             getMoviesDataFromJson(fetchNewMoviesJsonString(getContext().getString(R.string.settings_sort_order_top_rated_value)), (getContext().getString(R.string.settings_sort_order_top_rated_value)));
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(getContext().getString(R.string.boolean_sort_traversed_key), false);
+            editor.putString(getContext().getString(R.string.first_sort_order), Utility.getSortOrder(getContext()));
+            editor.commit();
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Error in parsing JSON: ", e);
         }
@@ -90,8 +98,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private String fetchNewMoviesJsonString(String sortOrder) {
 
         final String MOVIES_BASE_URL = "https://api.themoviedb.org/3/movie";
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-//        String sortOrder = sharedPreferences.getString(getContext().getString(R.string.settings_sort_order_key),getContext().getString(R.string.settings_sort_order_default_value));
+
         try {
             Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
                     .appendPath(sortOrder)
@@ -107,6 +114,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                     .build();
 
             Response response = client.newCall(request).execute();
+
             return response.body().string();
         }  catch (IOException e) {
             e.printStackTrace();
@@ -141,9 +149,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         String rating;
         String movieId;
 
-//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-//        String sortOrder = sharedPreferences.getString(getContext().getString(R.string.settings_sort_order_key),getContext().getString(R.string.settings_sort_order_default_value));
-
         if (results != null) {
             Vector<ContentValues> cVVector = new Vector<>(results.length());
             for (int i = 0; i < results.length(); i++) {
@@ -157,6 +162,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 rating = currentObject.getString(TMDB_RATING);
                 movieId = currentObject.getString(TMDB_ID);
 
+
                 movie.put(MovieColumns.COLUMN_MOVIE_TITLE,title);
                 movie.put(MovieColumns.COLUMN_SYNOPSIS, synopsis);
                 movie.put(MovieColumns.COLUMN_MOVIE_RATING, rating);
@@ -165,9 +171,10 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 movie.put(MovieColumns.COLUMN_BACKGROUND_IMAGE, backdropUrl);
                 movie.put(MovieColumns.COLUMN_TYPE, sortOrder);
                 movie.put(MovieColumns.COLUMN_MOVIE_ID, movieId);
+
                 cVVector.add(movie);
             }
-            //TODO: Convert vector to array bulk add to the database through content provider and display in logs
+
             int inserted = 0;
             // add to database
             if ( cVVector.size() > 0 ) {
@@ -182,6 +189,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         }
 
     }
+
+
 
 
     //all the other helper methods for the sync account

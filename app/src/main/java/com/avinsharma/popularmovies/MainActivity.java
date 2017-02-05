@@ -1,92 +1,63 @@
 package com.avinsharma.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.GridView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.avinsharma.popularmovies.adapter.MovieCursorAdapter;
 import com.avinsharma.popularmovies.data.MovieProvider;
 import com.avinsharma.popularmovies.sync.SyncAdapter;
 
-import java.util.ArrayList;
+import static com.avinsharma.popularmovies.DetailsActivity.DETAILS_FRAGMENT_TAG;
 
-public class MainActivity extends AppCompatActivity implements MovieCursorAdapter.Callback{
+public class MainActivity extends AppCompatActivity implements MovieCursorAdapter.Callback, LoaderManager.LoaderCallbacks<String[]> {
 
     static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    GridView gridView;
-    ArrayList movies;
-    MovieGridAdapter adapter;
-    TextView empty;
-    ProgressBar progressBar;
-
-    boolean hasDataSaved = false;
     static boolean hasPreferenceChanged = false;
+    boolean mTwoPane = false;
+
+    public static String movieId = null;
+    public final int DETAILS_LOADER_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*if (!(savedInstanceState == null || !savedInstanceState.containsKey("movies"))){
-            movies = savedInstanceState.getParcelableArrayList("movies");
-            hasDataSaved = true;
+        if (findViewById(R.id.container) != null) {
+            mTwoPane = true;
         }
-
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        empty = (TextView) findViewById(R.id.empty_textview);
-        gridView = (GridView) findViewById(R.id.grid_view);
-
-        gridView.setEmptyView(empty);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-                intent.putExtra("movie", adapter.getItem(i));
-                startActivity(intent);
-            }
-        });*/
-
-        getContentResolver().delete(MovieProvider.Movies.CONTENT_URI, null, null);
-        // Initialize sync adapter
-        SyncAdapter.initializeSyncAdapter(this);
-        SyncAdapter.syncImmediately(this);
+        if (savedInstanceState == null) {
+            if (Utility.isOnline(this))
+                getContentResolver().delete(MovieProvider.Movies.CONTENT_URI, null, null);
+            // Initialize sync adapter
+            SyncAdapter.initializeSyncAdapter(this);
+            SyncAdapter.syncImmediately(this);
+        }
     }
 
     @Override
     protected void onStart() {
-        if (hasPreferenceChanged){
+        if (hasPreferenceChanged) {
             GridFragment gridFragment = (GridFragment) getSupportFragmentManager().findFragmentById(R.id.grid_fragment);
             gridFragment.onPreferenceChanged();
             hasPreferenceChanged = false;
         }
-        /*if (!hasDataSaved || hasPreferenceChanged){
-            movies = new ArrayList();
-            adapter = new MovieGridAdapter(this, movies);
-            Log.v(LOG_TAG, "Making a new network call!!, hasDataChanged: " + hasPreferenceChanged
-            + " ,has saved data :" + hasDataSaved);
-            updateUi();
-        }else {
-            progressBar.setVisibility(View.GONE);
-            adapter = new MovieGridAdapter(this, movies);
-            Log.v(LOG_TAG, "Using saved data!!, hasDataChanged: " + hasPreferenceChanged);
-        }
-        gridView.setAdapter(adapter);*/
 
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        /*empty.setText("");
-        progressBar.setVisibility(View.VISIBLE);*/
         super.onStop();
     }
 
@@ -98,9 +69,15 @@ public class MainActivity extends AppCompatActivity implements MovieCursorAdapte
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_settings:
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+        switch (item.getItemId()) {
+            case R.id.popular_movies_menu:
+                onSortOrderChanged(getString(R.string.settings_sort_order_popular_value));
+                return true;
+            case R.id.top_rated_movies_menu:
+                onSortOrderChanged(getString(R.string.settings_sort_order_top_rated_value));
+                return true;
+            case R.id.favourite_movies_menu:
+                onSortOrderChanged(getString(R.string.settings_sort_order_favourite_value));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -108,17 +85,60 @@ public class MainActivity extends AppCompatActivity implements MovieCursorAdapte
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        /*hasDataSaved = true;
-        outState.putParcelableArrayList("movies", movies);*/
+
         super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onItemSelected(Uri targetUri) {
-        //TODO: start detail fragment by passing uri in bundle or data in fragment or intent respectively
-        Intent intent = new Intent(this, DetailsActivity.class);
-        intent.setData(targetUri);
-        startActivity(intent);
-        Toast.makeText(this, "Callback called: onItemSelected, URI: " + targetUri.toString(), Toast.LENGTH_SHORT).show();
+    public void onItemSelected(Uri targetUri, String movieId) {
+        MainActivity.movieId = movieId;
+        if (!mTwoPane) {
+            Intent intent = new Intent(this, DetailsActivity.class);
+            intent.setData(targetUri);
+            startActivity(intent);
+        } else {
+            DetailsFragment detailsFragment = new DetailsFragment();
+            Bundle args = new Bundle();
+            args.putParcelable(DetailsFragment.DETAIL_URI, targetUri);
+            detailsFragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, detailsFragment, DETAILS_FRAGMENT_TAG).commit();
+            Loader loader = getSupportLoaderManager().getLoader(DETAILS_LOADER_ID);
+            if (Utility.isOnline(this))
+                if (loader != null)
+                    getSupportLoaderManager().restartLoader(DETAILS_LOADER_ID, null, this).forceLoad();
+                else
+                    getSupportLoaderManager().initLoader(DETAILS_LOADER_ID, null, this).forceLoad();
+        }
+    }
+
+    public void onSortOrderChanged(String sortKey){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.settings_sort_order_key), sortKey);
+        editor.commit();
+        GridFragment gridFragment = (GridFragment) getSupportFragmentManager().findFragmentById(R.id.grid_fragment);
+        gridFragment.onPreferenceChanged();
+    }
+
+    @Override
+    public Loader<String[]> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "In on create loader, MovieId is: " + movieId);
+        return new DetailsLoader(this, movieId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+        Log.v(LOG_TAG, "innOnasf------------------------------23495872930570298374502983750982374");
+        if (data != null) {
+            DetailsFragment detailsFragment = (DetailsFragment) getSupportFragmentManager().findFragmentByTag(DETAILS_FRAGMENT_TAG);
+            detailsFragment.updateReviewsAndTrailers(data);
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String[]> loader) {
+
     }
 }

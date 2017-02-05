@@ -26,11 +26,7 @@
         <activity
             android:name=".DetailsActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".SettingsActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
-        </activity>
+
         <provider
             android:authorities="com.avinsharma.popularmovies"
             android:name=".data.generated.MovieProvider"

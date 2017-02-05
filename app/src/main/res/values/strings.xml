@@ -14,6 +14,10 @@
     <string name="settings_sort_order_popular_label">Popular</string>
     <string name="settings_sort_order_popular_value">popular</string>
 
+    <!--Strings for Sort order favourite option-->
+    <string name="settings_sort_order_favourite_label">Favourite</string>
+    <string name="settings_sort_order_favourite_value">favourite</string>
+
     <!--String for sort order top-rated option-->
     <string name="settings_sort_order_top_rated_label">Top Rated</string>
     <string name="settings_sort_order_top_rated_value">top_rated</string>
@@ -21,7 +25,15 @@
     <string name="content_authority">com.avinsharma.popularmovies</string>
     <string name="sync_account_type">avinsharma.com</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--Strings for storing if both the sort options are traversed-->
+    <string name="boolean_sort_traversed_key">sort_traversed</string>
+
+    <!--Strings for first sort order-->
+    <string name="first_sort_order">first_sort</string>
+
+    <string name="label_reviews">Reviews</string>
+    <string name="label_videos">Videos</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="share">Share</string>
 
 </resources>

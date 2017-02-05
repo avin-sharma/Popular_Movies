@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/details_main_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -20,10 +21,10 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            card_view:cardCornerRadius="4dp"
-            card_view:cardElevation="@dimen/cardview_default_elevation"
+            android:layout_gravity="center"
             android:layout_margin="8dp"
-            android:layout_gravity="center">
+            card_view:cardCornerRadius="4dp"
+            card_view:cardElevation="@dimen/cardview_default_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -45,6 +46,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -53,6 +55,15 @@
                     android:layout_weight="1"
                     android:orientation="vertical">
 
+                    <ToggleButton
+                        android:id="@+id/fav_toggle_button"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="end"
+                        android:layout_marginBottom="@dimen/vertical_spacing_grid_view"
+                        android:textOn=""
+                        android:textOff=""
+                        android:background="@drawable/star_grey_off"/>
                     <TextView
                         android:id="@+id/title_textview"
                         android:layout_width="wrap_content"
@@ -86,10 +97,10 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            card_view:cardCornerRadius="4dp"
-            card_view:cardElevation="@dimen/cardview_default_elevation"
+            android:layout_gravity="center"
             android:layout_margin="8dp"
-            android:layout_gravity="center">
+            card_view:cardCornerRadius="4dp"
+            card_view:cardElevation="@dimen/cardview_default_elevation">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -114,5 +125,92 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/videos_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            card_view:cardCornerRadius="4dp"
+            card_view:cardElevation="@dimen/cardview_default_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_spacing_grid_view"
+                    android:text="@string/label_videos"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/trailer_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:dividerHeight="4dp"/>
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/reviews_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            card_view:cardCornerRadius="4dp"
+            card_view:cardElevation="@dimen/cardview_default_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_spacing_grid_view"
+                    android:text="@string/label_reviews"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textStyle="bold" />
+
+                <ListView
+                    android:id="@+id/reviews_listview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:dividerHeight="4dp"/>
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            android:id="@+id/no_internet_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            card_view:cardCornerRadius="4dp"
+            card_view:cardElevation="@dimen/cardview_default_elevation"
+            android:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textStyle="italic"
+                android:text="@string/no_internet_connection"/>
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
 </ScrollView>

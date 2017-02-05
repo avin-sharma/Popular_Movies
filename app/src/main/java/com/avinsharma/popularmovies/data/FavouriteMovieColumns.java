@@ -33,6 +33,6 @@ public interface FavouriteMovieColumns {
     public static final String COLUMN_IMAGE_URL = "image";
 
     @DataType(DataType.Type.TEXT) @NotNull
-    public static final String COLUMN_BACKGROUD_IMAGE = "background";
+    public static final String COLUMN_BACKGROUND_IMAGE = "background";
 
 }

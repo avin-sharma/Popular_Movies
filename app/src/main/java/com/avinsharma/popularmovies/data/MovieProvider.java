@@ -50,6 +50,27 @@ public final class MovieProvider {
             return buildUri(Path.MOVIES, String.valueOf(id));
         }
     }
+
+    @TableEndpoint(table = MovieDatabase.FAVOURITE_MOVIES)
+    public static class FavouriteMovies {
+
+        @ContentUri(
+                path = Path.FAVOURITE_MOVIES,
+                type = "vnd.android.cursor.dir/favourites")
+        public static final Uri CONTENT_URI = buildUri(Path.FAVOURITE_MOVIES);
+
+
+        @InexactContentUri(
+                name = "MOVIE_SELECTED",
+                path = Path.FAVOURITE_MOVIES + "/#",
+                type = "vnd.android.cursor.item/favourites",
+                whereColumn = FavouriteMovieColumns._ID,
+                pathSegment = 1
+        )
+        public static Uri withId(long id){
+            return buildUri(Path.FAVOURITE_MOVIES, String.valueOf(id));
+        }
+    }
 }
 
 

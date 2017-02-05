@@ -3,7 +3,6 @@ package com.avinsharma.popularmovies.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import android.widget.ImageView;
 
 import com.avinsharma.popularmovies.GridFragment;
 import com.avinsharma.popularmovies.R;
+import com.avinsharma.popularmovies.Utility;
 import com.avinsharma.popularmovies.data.MovieProvider;
 import com.squareup.picasso.Picasso;
 
@@ -24,9 +24,11 @@ public class MovieCursorAdapter
 
     Context mContext;
     ViewHolder mVH;
+    int movieId;
+    long id;
 
     public interface Callback {
-        void onItemSelected(Uri targetUri);
+        void onItemSelected(Uri targetUri, String movieId);
     }
 
     public MovieCursorAdapter(Context context, Cursor cursor){
@@ -48,21 +50,25 @@ public class MovieCursorAdapter
     @Override
     public MovieCursorAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ImageView poster = (ImageView) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
-        ViewHolder viewHolder = new ViewHolder(poster, parent);
-        return viewHolder;
+        return new ViewHolder(poster, parent);
     }
 
     @Override
     public void onBindViewHolder(MovieCursorAdapter.ViewHolder viewHolder, Cursor cursor) {
+        Uri uri = null;
         final String title = cursor.getString(GridFragment.COLUMN_MOVIE_TITLE);
         final long id = cursor.getLong(GridFragment._ID);
+        final int movieId = cursor.getInt(GridFragment.COLUMN_MOVIE_ID);
         Picasso.with(mContext).load(cursor.getString(GridFragment.COLUMN_IMAGE_URL)).into(viewHolder.poster);
+        if (Utility.getSortOrder(mContext).equals("favourite"))
+            uri = MovieProvider.FavouriteMovies.withId(id);
+        else
+            uri = MovieProvider.Movies.withId(id);
+        final Uri finalUri = uri;
         viewHolder.poster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Uri uri = MovieProvider.Movies.withId(id);
-                Snackbar.make(view, title, Snackbar.LENGTH_SHORT).show();
-                ((Callback) mContext).onItemSelected(uri);
+                ((Callback) mContext).onItemSelected(finalUri, String.valueOf(movieId));
             }
         });
     }
