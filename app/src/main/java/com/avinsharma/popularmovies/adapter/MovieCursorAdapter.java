@@ -1,5 +1,6 @@
 package com.avinsharma.popularmovies.adapter;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,7 +13,8 @@ import android.widget.ImageView;
 import com.avinsharma.popularmovies.GridFragment;
 import com.avinsharma.popularmovies.R;
 import com.avinsharma.popularmovies.Utility;
-import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.data.MovieContract.FavouriteMovieColumns;
+import com.avinsharma.popularmovies.data.MovieContract.MovieColumns;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -31,12 +33,12 @@ public class MovieCursorAdapter
         void onItemSelected(Uri targetUri, String movieId);
     }
 
-    public MovieCursorAdapter(Context context, Cursor cursor){
+    public MovieCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor);
         mContext = context;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView poster;
         public View parent;
@@ -47,6 +49,7 @@ public class MovieCursorAdapter
             this.parent = parent;
         }
     }
+
     @Override
     public MovieCursorAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ImageView poster = (ImageView) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
@@ -61,9 +64,10 @@ public class MovieCursorAdapter
         final int movieId = cursor.getInt(GridFragment.COLUMN_MOVIE_ID);
         Picasso.with(mContext).load(cursor.getString(GridFragment.COLUMN_IMAGE_URL)).into(viewHolder.poster);
         if (Utility.getSortOrder(mContext).equals("favourite"))
-            uri = MovieProvider.FavouriteMovies.withId(id);
+            uri = ContentUris.withAppendedId(FavouriteMovieColumns.CONTENT_URI, id);
         else
-            uri = MovieProvider.Movies.withId(id);
+            uri = ContentUris.withAppendedId(MovieColumns.CONTENT_URI, id);
+
         final Uri finalUri = uri;
         viewHolder.poster.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -29,9 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.avinsharma.popularmovies.data.FavouriteMovieColumns;
-import com.avinsharma.popularmovies.data.MovieColumns;
-import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.data.MovieContract.FavouriteMovieColumns;
+import com.avinsharma.popularmovies.data.MovieContract.MovieColumns;
 import com.squareup.picasso.Picasso;
 
 
@@ -95,7 +94,6 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
         if (arguments != null) {
             mUri = arguments.getParcelable(DETAIL_URI);
         }
-        Toast.makeText(getContext(), "Uri is: " + mUri, Toast.LENGTH_SHORT).show();
 
 
         if (!Utility.isOnline(getContext())) {
@@ -221,10 +219,10 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
             boolean fav = Utility.isMovieFavourite(getContext(), movieCursor.getString(COLUMN_MOVIE_ID));
             Log.v(LOG_TAG, "isChecked: " + favourite.isChecked() + " is in fav: " + fav + " contentValues not null? " + String.valueOf(contentValues != null));
             if (favourite.isChecked() && !fav && contentValues != null) {
-                getContext().getContentResolver().insert(MovieProvider.FavouriteMovies.CONTENT_URI, contentValues);
+                getContext().getContentResolver().insert(FavouriteMovieColumns.CONTENT_URI, contentValues);
             }
             if (!favourite.isChecked() && fav && contentValues != null) {
-                getContext().getContentResolver().delete(MovieProvider.FavouriteMovies.CONTENT_URI,
+                getContext().getContentResolver().delete(FavouriteMovieColumns.CONTENT_URI,
                         FavouriteMovieColumns.COLUMN_MOVIE_ID + "=?", new String[]{movieCursor.getString(COLUMN_MOVIE_ID)});
             }
         }

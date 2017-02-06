@@ -29,7 +29,7 @@
 
         <provider
             android:authorities="com.avinsharma.popularmovies"
-            android:name=".data.generated.MovieProvider"
+            android:name=".data.MovieProvider"
             android:exported="false"
             android:syncable="true"/>
 

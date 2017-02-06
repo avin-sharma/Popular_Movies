@@ -13,7 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.avinsharma.popularmovies.adapter.MovieCursorAdapter;
-import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.data.MovieContract.MovieColumns;
 import com.avinsharma.popularmovies.sync.SyncAdapter;
 
 import static com.avinsharma.popularmovies.DetailsActivity.DETAILS_FRAGMENT_TAG;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MovieCursorAdapte
         }
         if (savedInstanceState == null) {
             if (Utility.isOnline(this))
-                getContentResolver().delete(MovieProvider.Movies.CONTENT_URI, null, null);
+                getContentResolver().delete(MovieColumns.CONTENT_URI, null, null);
             // Initialize sync adapter
             SyncAdapter.initializeSyncAdapter(this);
             SyncAdapter.syncImmediately(this);

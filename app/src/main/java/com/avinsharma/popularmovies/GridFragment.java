@@ -4,6 +4,7 @@ package com.avinsharma.popularmovies;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,9 +21,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.avinsharma.popularmovies.adapter.MovieCursorAdapter;
-import com.avinsharma.popularmovies.data.FavouriteMovieColumns;
-import com.avinsharma.popularmovies.data.MovieColumns;
-import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.data.MovieContract.FavouriteMovieColumns;
+import com.avinsharma.popularmovies.data.MovieContract.MovieColumns;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -50,7 +50,9 @@ public class GridFragment extends Fragment implements LoaderManager.LoaderCallba
 
     public static final String LOG_TAG = GridFragment.class.getSimpleName();
     public static final int MOVIE_LOADER_ID = 0;
+    public static final String GRID_STATE_KEY = "grid_state_key";
     private String mSortOrder;
+    Parcelable mListState = null;
 
     public GridFragment() {
         // Required empty public constructor
@@ -66,6 +68,11 @@ public class GridFragment extends Fragment implements LoaderManager.LoaderCallba
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         empty = (TextView) view.findViewById(R.id.empty_textview);
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        if (savedInstanceState != null) {
+            Log.v(LOG_TAG, "SavedInstanceState not null!!!");
+            mListState = savedInstanceState.getParcelable(GRID_STATE_KEY);
+        }
+
         mGridView.setLayoutManager(mLayoutManager);
         mAdapter = new MovieCursorAdapter(getContext(), null);
         mGridView.setAdapter(mAdapter);
@@ -80,9 +87,10 @@ public class GridFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState == null)
-        getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
-        else
+            getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+        else {
             getLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
+        }
         Log.v(LOG_TAG, "onActivityCreated");
     }
 
@@ -123,14 +131,14 @@ public class GridFragment extends Fragment implements LoaderManager.LoaderCallba
                     FavouriteMovieColumns.COLUMN_MOVIE_ID
             };
             return new CursorLoader(getActivity(),
-                    MovieProvider.FavouriteMovies.CONTENT_URI,
+                    FavouriteMovieColumns.CONTENT_URI,
                     projection,
                     null,
                     null,
                     null);
         } else
             return new CursorLoader(getActivity(),
-                    MovieProvider.Movies.CONTENT_URI,
+                    MovieColumns.CONTENT_URI,
                     projection,
                     MovieColumns.COLUMN_TYPE + "=?",
                     new String[]{sortOrder},
@@ -144,6 +152,11 @@ public class GridFragment extends Fragment implements LoaderManager.LoaderCallba
         {
             mAdapter.swapCursor(data);
             empty.setVisibility(View.GONE);
+            if (mListState != null) {
+                Log.v(LOG_TAG, "mListState not null!!!");
+                mLayoutManager.onRestoreInstanceState(mListState);
+            }
+
         }
         else if (!Utility.isOnline(getContext()))
             empty.setText(getString(R.string.no_internet_connection));
@@ -156,5 +169,20 @@ public class GridFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Log.v(LOG_TAG, "In onSaveInstanceState");
+        mListState = mGridView.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(GRID_STATE_KEY, mListState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 }

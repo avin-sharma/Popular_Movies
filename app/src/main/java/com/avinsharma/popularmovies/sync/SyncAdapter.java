@@ -22,8 +22,7 @@ import android.util.Log;
 import com.avinsharma.popularmovies.BuildConfig;
 import com.avinsharma.popularmovies.R;
 import com.avinsharma.popularmovies.Utility;
-import com.avinsharma.popularmovies.data.MovieColumns;
-import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.data.MovieContract.MovieColumns;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -180,9 +179,9 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             if ( cVVector.size() > 0 ) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                inserted = mContentResolver.bulkInsert(MovieProvider.Movies.CONTENT_URI, cvArray);
+                inserted = mContentResolver.bulkInsert(MovieColumns.CONTENT_URI, cvArray);
                 Log.v(LOG_TAG, "---------------------------------inserted: " + inserted);
-                Cursor cursor = mContentResolver.query(MovieProvider.Movies.CONTENT_URI, new String[]{MovieColumns.COLUMN_MOVIE_TITLE}, MovieColumns.COLUMN_TYPE + "=?", new String[]{sortOrder},null);
+                Cursor cursor = mContentResolver.query(MovieColumns.CONTENT_URI, new String[]{MovieColumns.COLUMN_MOVIE_TITLE}, MovieColumns.COLUMN_TYPE + "=?", new String[]{sortOrder},null);
                 while (cursor.moveToNext())
                     Log.v(LOG_TAG, cursor.getString(0));
             }

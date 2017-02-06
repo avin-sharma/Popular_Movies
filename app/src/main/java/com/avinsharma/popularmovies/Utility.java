@@ -11,8 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.avinsharma.popularmovies.data.FavouriteMovieColumns;
-import com.avinsharma.popularmovies.data.MovieProvider;
+import com.avinsharma.popularmovies.data.MovieContract.FavouriteMovieColumns;
 
 /**
  * Created by Avin on 02-02-2017.
@@ -42,7 +41,7 @@ public class Utility {
     }
 
     public static boolean isMovieFavourite(Context context, String movieId){
-        Cursor cursor = context.getContentResolver().query(MovieProvider.FavouriteMovies.CONTENT_URI,
+        Cursor cursor = context.getContentResolver().query(FavouriteMovieColumns.CONTENT_URI,
                 null,
                 FavouriteMovieColumns.COLUMN_MOVIE_ID + "=?",
                 new String[]{movieId},
