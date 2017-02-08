@@ -135,6 +135,9 @@ public class DetailsFragment extends Fragment implements LoaderManager.LoaderCal
                     sendIntent.setAction(Intent.ACTION_SEND);
                     sendIntent.putExtra(Intent.EXTRA_TEXT, firstTrailer);
                     sendIntent.setType("text/plain");
+                    if (sendIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                        startActivity(sendIntent);
+                    }
                     startActivity(sendIntent);
                 }else
                     Toast.makeText(getContext(), "Try again with Internet connectivity", Toast.LENGTH_SHORT).show();

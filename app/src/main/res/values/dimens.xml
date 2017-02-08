@@ -5,4 +5,8 @@
     <dimen name="grid_view_column_width">100dp</dimen>
     <dimen name="vertical_spacing_grid_view">8dp</dimen>
     <dimen name="horizontal_spacing_grid_view">8dp</dimen>
+    <dimen name="backdrop_height">200dp</dimen>
+    <dimen name="card_corner_radius">4dp</dimen>
+    <dimen name="star_width">32dp</dimen>
+    <dimen name="star_height">32dp</dimen>
 </resources>

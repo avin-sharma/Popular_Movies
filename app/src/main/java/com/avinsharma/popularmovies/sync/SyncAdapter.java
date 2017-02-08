@@ -116,7 +116,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             return response.body().string();
         }  catch (IOException e) {
-            e.printStackTrace();
+            Log.v(LOG_TAG, "Error in parsing JSON: " , e);
         }
         return null;
     }

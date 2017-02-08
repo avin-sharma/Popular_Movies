@@ -15,15 +15,15 @@
         <ImageView
             android:id="@+id/backdrop_imageview"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="@dimen/backdrop_height"
             android:scaleType="centerCrop" />
 
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="8dp"
-            card_view:cardCornerRadius="4dp"
+            android:layout_margin="@dimen/vertical_spacing_grid_view"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
             card_view:cardElevation="@dimen/cardview_default_elevation">
 
             <LinearLayout
@@ -57,8 +57,8 @@
 
                     <ToggleButton
                         android:id="@+id/fav_toggle_button"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="@dimen/star_width"
+                        android:layout_height="@dimen/star_height"
                         android:layout_gravity="end"
                         android:layout_marginBottom="@dimen/vertical_spacing_grid_view"
                         android:textOn=""
@@ -98,8 +98,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="8dp"
-            card_view:cardCornerRadius="4dp"
+            android:layout_margin="@dimen/horizontal_spacing_grid_view"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
             card_view:cardElevation="@dimen/cardview_default_elevation">
 
             <LinearLayout
@@ -131,7 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/horizontal_spacing_grid_view"
             card_view:cardCornerRadius="4dp"
             card_view:cardElevation="@dimen/cardview_default_elevation">
 
@@ -156,7 +156,7 @@
                     android:id="@+id/trailer_listview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:dividerHeight="4dp"/>
+                    android:dividerHeight="@dimen/card_corner_radius"/>
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
@@ -166,8 +166,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="8dp"
-            card_view:cardCornerRadius="4dp"
+            android:layout_margin="@dimen/horizontal_spacing_grid_view"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
             card_view:cardElevation="@dimen/cardview_default_elevation">
 
             <LinearLayout
@@ -200,8 +200,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="8dp"
-            card_view:cardCornerRadius="4dp"
+            android:layout_margin="@dimen/horizontal_spacing_grid_view"
+            card_view:cardCornerRadius="@dimen/card_corner_radius"
             card_view:cardElevation="@dimen/cardview_default_elevation"
             android:visibility="gone">
             <TextView
