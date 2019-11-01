@@ -1,5 +1,5 @@
 # PopularMovies
-Udacity Nanodegree Popular Movies
+Popular Movies
 
 Add your api key to build.gradle
 
